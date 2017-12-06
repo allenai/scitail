@@ -28,12 +28,25 @@ SciTail (Science Entailment) dataset and models
   Linux   (with CUDA): `conda install pytorch torchvision cuda80 -c soumith`
 
 
-6. Test installation by training an entailment model on subset of SNLI
+6. Test installation
 
  ```
+ pytest -v
  ```
 
 
-# Train the models on SciTail dataset
+# Train the SciTail models
 TBD
 
+# Evaluate the SciTail models
+TBD
+
+If you find these models helpful in your work, please cite:
+```
+@inproceedings{scitail,
+	  Author = {Tushar Khot and Ashish Sabharwal and Peter Clark},
+     Booktitle = {AAAI},
+     Title = {SciTail: A Textual Entailment Dataset from Science Question Answering},
+     Year = {2018}
+}
+```
