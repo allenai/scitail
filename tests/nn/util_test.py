@@ -29,7 +29,7 @@ class TestNnUtil(AllenNlpTestCase):
         assert_array_almost_equal(masked_matrix_mean,
                                   numpy.array([2.666666, 0.0]))
 
-    def test_masked_softmax_masked(self):
+    def test_masked_mean_masked(self):
         # Testing the general masked 1D case.
         vector_1d = Variable(torch.FloatTensor([[1.0, 2.0, 5.0]]))
         mask_1d = Variable(torch.FloatTensor([[1.0, 0.0, 1.0]]))

@@ -58,22 +58,16 @@ class TestEntailmentTupleReader(AllenNlpTestCase):
             for edge in fields["edge_labels"].field_list:
                 print(edge.label,  end='", "')
         assert len(dataset.instances) == 3
-        fields = dataset.instances[0].fields
-        assert [t.text for t in fields["premise"].tokens] == instance1["premise"]
-        assert [t.text for t in fields["hypothesis"].tokens] == instance1["hypothesis"]
-        self.compare_nodes(fields, instance1)
-        self.compare_edges(fields, instance1)
-        assert fields["label"].label == instance1["label"]
-        fields = dataset.instances[1].fields
-        assert [t.text for t in fields["premise"].tokens] == instance2["premise"]
-        assert [t.text for t in fields["hypothesis"].tokens] == instance2["hypothesis"]
-        assert fields["label"].label == instance2["label"]
-        self.compare_nodes(fields, instance2)
-        fields = dataset.instances[2].fields
-        assert [t.text for t in fields["premise"].tokens] == instance3["premise"]
-        assert [t.text for t in fields["hypothesis"].tokens] == instance3["hypothesis"]
-        assert fields["label"].label == instance3["label"]
-        self.compare_nodes(fields, instance3)
+        self.compare_instance(dataset.instances[0].fields, instance1)
+        self.compare_instance(dataset.instances[1].fields, instance2)
+        self.compare_instance(dataset.instances[2].fields, instance3)
+
+    def compare_instance(self, fields, instance):
+        assert [t.text for t in fields["premise"].tokens] == instance["premise"]
+        assert [t.text for t in fields["hypothesis"].tokens] == instance["hypothesis"]
+        assert fields["label"].label == instance["label"]
+        self.compare_nodes(fields, instance)
+        self.compare_edges(fields, instance)
 
     def compare_nodes(self, input_fields, test_instance):
         field_nodes = sorted(input_fields["nodes"].field_list,

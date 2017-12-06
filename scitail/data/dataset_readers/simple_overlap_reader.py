@@ -64,11 +64,10 @@ class SimpleOverlapReader(DatasetReader):
         return Dataset(instances)
 
     @overrides
-    def text_to_instance(self,  # type: ignore
+    def text_to_instance(self,
                          premise: str,
                          hypothesis: str,
                          label: str = None) -> Instance:
-        # pylint: disable=arguments-differ
         fields: Dict[str, Field] = {}
         premise_tokens = [x.text for x in self._tokenizer.tokenize(premise)]
         hypothesis_tokens = [x.text for x in self._tokenizer.tokenize(hypothesis)]

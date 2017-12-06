@@ -25,7 +25,7 @@ class SimpleOverlap(Model):
         self._loss = torch.nn.CrossEntropyLoss()
         initializer(self)
 
-    def forward(self,  # type: ignore
+    def forward(self,
                 features: torch.Tensor,
                 metadata: List[Dict[str, Any]] = None,
                 label: torch.IntTensor = None) -> Dict[str, torch.Tensor]:

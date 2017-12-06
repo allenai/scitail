@@ -74,7 +74,6 @@ class EntailmentTupleReader(DatasetReader):
                          hypothesis: str,
                          hypothesis_structure: str,
                          label: str = None) -> Instance:
-        # pylint: disable=arguments-differ
         fields: Dict[str, Field] = {}
         premise_tokens = self._tokenizer.tokenize(premise)[-self._max_tokens:]
         hypothesis_tokens = self._tokenizer.tokenize(hypothesis)[-self._max_tokens:]
