@@ -71,27 +71,36 @@ class SimpleOverlapReader(DatasetReader):
         fields: Dict[str, Field] = {}
         premise_tokens = [x.text for x in self._tokenizer.tokenize(premise)]
         hypothesis_tokens = [x.text for x in self._tokenizer.tokenize(hypothesis)]
+        # n-grams from the premise
         prem_trigrams = set(skipgrams(premise_tokens, 3, 1))
         prem_bigrams = set(skipgrams(premise_tokens, 2, 1))
         prem_unigrams = set(ngrams(premise_tokens, 1))
 
+        # n-grams from the hypothesis
         hyp_trigrams = set(skipgrams(hypothesis_tokens, 3, 1))
         hyp_bigrams = set(skipgrams(hypothesis_tokens, 2, 1))
         hyp_unigrams = set(ngrams(hypothesis_tokens, 1))
 
-        tri_overlap = float(len(prem_trigrams.intersection(hyp_trigrams))) / len(hyp_trigrams) \
-            if len(hyp_trigrams) > 0 else 0.0
-        bi_overlap = float(len(prem_bigrams.intersection(hyp_bigrams))) / len(hyp_bigrams) \
-            if len(hyp_bigrams) > 0 else 0.0
-        uni_overlap = float(len(prem_unigrams.intersection(hyp_unigrams))) / len(hyp_unigrams) \
-            if len(hyp_unigrams) > 0 else 0.0
+        # overlap proportions
+        if hyp_trigrams:
+            tri_overlap = len(prem_trigrams.intersection(hyp_trigrams)) / len(hyp_trigrams)
+        else:
+            0.0
+        if hyp_bigrams:
+            bi_overlap = len(prem_bigrams.intersection(hyp_bigrams)) / len(hyp_bigrams)
+        else:
+            0.0
+        if hyp_unigrams:
+            uni_overlap = len(prem_unigrams.intersection(hyp_unigrams)) / len(hyp_unigrams)
+        else:
+            0.0
 
         fields['features'] = FeaturesField([tri_overlap, bi_overlap, uni_overlap])
         metadata = {
             'premise': premise,
             'hypothesis': hypothesis,
-            'premise_tokens': [token.text for token in premise_tokens],
-            'hypothesis_tokens': [token.text for token in hypothesis_tokens]
+            'premise_tokens': premise_tokens,
+            'hypothesis_tokens': hypothesis_tokens
         }
         fields['metadata'] = MetadataField(metadata)
         if label:

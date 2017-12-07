@@ -54,13 +54,11 @@ class EntailmentTupleReader(DatasetReader):
             logger.info("Reading entailment instances from TSV dataset at: %s", file_path)
             for line in tqdm.tqdm(entailment_file):
                 fields = line.split("\t")
-                if len(fields) < 4:
-                    raise ValueError("Incorrect number of fields in {} : {}".format(len(fields),
-                                                                                    line))
-                premise = fields[0]
-                hypothesis = fields[1]
-                label = fields[2]
-                hypothesis_structure = fields[3]
+                if len(fields) != 4:
+                    raise ValueError("Expected four fields: "
+                                     "premise   hypothesis  label   hypothesis_structure. "
+                                     "Found {} fields in {}".format(len(fields), line))
+                premise, hypothesis, label, hypothesis_structure = fields
                 instances.append(self.text_to_instance(premise, hypothesis, hypothesis_structure,
                                                        label))
         if not instances:
@@ -69,7 +67,7 @@ class EntailmentTupleReader(DatasetReader):
         return Dataset(instances)
 
     @overrides
-    def text_to_instance(self,  # type: ignore
+    def text_to_instance(self,
                          premise: str,
                          hypothesis: str,
                          hypothesis_structure: str,
@@ -93,14 +91,21 @@ class EntailmentTupleReader(DatasetReader):
         return Instance(fields)
 
     def _add_structure_to_fields(self, structure, fields) -> None:
-        """ Add structure (nodes and edges) to the instance fields"""
+        """
+        Add structure (nodes and edges) to the instance fields. Specifically, convert
+        "plants<>produce<>oxygen" into ("produce", subj, "plants"), ("produce", obj, "oxygen"),
+        ("plants", subj-obj, "oxygen"). Each quoted string forms a node represented using a
+        TextField. Each source and target node in an edge is represented using IndexField into
+        the list of nodes and the edge label is represented using a LabelField with "edges"
+        namespace.
+        """
         # take the last tuples
         tuples = structure.split("$$$")[-self._max_tuples:]
         node_list, edge_list = self._extract_nodes_and_edges_from_tuples(tuples)
         nodes_field = ListField(node_list)
-        edge_source_list = list()
-        edge_target_list = list()
-        edge_label_list = list()
+        edge_source_list = []
+        edge_target_list = []
+        edge_label_list = []
         for edge in edge_list:
             source_field = IndexField(edge[0], nodes_field)
             target_field = IndexField(edge[2], nodes_field)
@@ -120,21 +125,22 @@ class EntailmentTupleReader(DatasetReader):
         """
         Extract the nodes and edges from the list of tuples. Returns a list of nodes and list of
         edges where the nodes are represented as list of ``TextField`` and edges as list of
-        (source index, edge label, target index) where the indices refer to the list of nodes.
+        (source index, edge label, target index). The source and target indices refer to the
+        index of the node in the list of nodes.
         """
         # list of string representation of the nodes used to find the index of the source/target
         # node for each edge
-        node_strings = list()
-        node_text_fields = list()
-        edge_tuples = list()
-        for tuple in tuples:
-            tuple_fields = tuple.split("<>")
+        node_strings = []
+        node_text_fields = []
+        edge_tuples = []
+        for openie_tuple in tuples:
+            tuple_fields = openie_tuple.split("<>")
             nodes, edges = self._extract_nodes_and_edges_from_fields(tuple_fields)
             # first, collect the nodes in the graph
             for node in nodes:
                 if node not in node_strings:
                     node_tokens = self._tokenizer.tokenize(node)
-                    if len(node_tokens) == 0:
+                    if not node_tokens:
                         raise ValueError("Empty phrase from {}".format(node))
                     node_strings.append(node)
                     node_text_fields.append(TextField(node_tokens, self._token_indexers))
@@ -160,27 +166,30 @@ class EntailmentTupleReader(DatasetReader):
         string and edges as [source node, edge label, target node].
         """
         nodes = set()
-        edges = list()
+        edges = []
         subj = self._get_tokenized_rep(fields[0])
         pred = self._get_tokenized_rep(fields[1])
-        if len(subj):
+        if subj:
             nodes.add(subj)
-        if len(pred):
+        if pred:
             nodes.add(pred)
-        if len(subj) and len(pred):
+        # create a subj edge between the predicate and subject
+        if subj and pred:
             edges.append([pred, "subj", subj])
         if len(fields) > 2:
             obj1 = self._get_tokenized_rep(fields[2])
-            if len(obj1):
+            if obj1:
                 nodes.add(obj1)
-                if len(subj):
+                # create a subj-obj edge between the subject and object
+                if subj:
                     edges.append([subj, "subj-obj", obj1])
         for obj in fields[2:]:
             last_ent = pred
+            # identify the object type and split longer objects, if needed
             for phrase, ptype in self._split_object_phrase(obj):
                 clean_phr = self._get_tokenized_rep(phrase)
-                if not len(clean_phr):
-                    print("Unexpected empty phrase from {}".format(obj))
+                if not clean_phr:
+                    logger.warning("Unexpected empty phrase from {}".format(obj))
                 nodes.add(clean_phr)
                 edges.append([last_ent, ptype, clean_phr])
                 last_ent = clean_phr
@@ -191,7 +200,7 @@ class EntailmentTupleReader(DatasetReader):
         Get a clean representation of the field based on the tokens. This ensures that
         strings with the same tokens have the same string representation.
         """
-        return " ".join(map(lambda x: x.text, self._tokenizer.tokenize(field.strip())))
+        return " ".join([x.text for x in self._tokenizer.tokenize(field.strip())])
 
     def _split_object_phrase(self, field: str) -> List[Tuple[str, str]]:
         """
@@ -200,9 +209,9 @@ class EntailmentTupleReader(DatasetReader):
         (changing liquid water, of), (water vapor, into)}
         """
         clean_obj, base_type = self._get_base_object_and_type(field)
-        tokens = map(lambda x: x.text, self._tokenizer.tokenize(clean_obj))
-        split_objects = list()
-        object_types = list()
+        tokens = [x.text for x in self._tokenizer.tokenize(clean_obj)]
+        split_objects = []
+        object_types = []
         current_obj = ""
         current_type = base_type
         for token in tokens:
@@ -216,9 +225,10 @@ class EntailmentTupleReader(DatasetReader):
         if current_obj != "":
             split_objects.append(current_obj)
             object_types.append(current_type)
-        return zip(split_objects, object_types)
+        return list(zip(split_objects, object_types))
 
     def _get_base_object_and_type(self, field: str) -> Tuple[str, str]:
+        """Identify the object type for the object in the OpenIE tuple"""
         if field.startswith("L:"):
             return field[2:], "L"
         if field.startswith("T:"):
@@ -226,6 +236,7 @@ class EntailmentTupleReader(DatasetReader):
         for prep in self.PREPOSITION_LIST:
             if field.startswith(prep + " "):
                 return field[len(prep) + 1:], prep
+        # if no match found, use the generic obj type
         return field, "obj"
 
     PREPOSITION_LIST = ["with", "at", "from", "into", "during", "including", "until", "against",
