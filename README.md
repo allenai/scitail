@@ -67,7 +67,7 @@ with the appropriate train/validation sets specified in the training configurati
 If you find these models helpful in your work, please cite:
 ```
 @inproceedings{scitail,
-	 Author = {Tushar Khot and Ashish Sabharwal and Peter Clark},
+     Author = {Tushar Khot and Ashish Sabharwal and Peter Clark},
      Booktitle = {AAAI},
      Title = {{SciTail}: A Textual Entailment Dataset from Science Question Answering},
      Year = {2018}
