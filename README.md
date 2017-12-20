@@ -1,5 +1,27 @@
 # Scitail
-SciTail (Science Entailment) dataset and models
+A repository of the the entailment models used for evaluation in the __SciTail: A Textual
+Entailment Dataset from Science Question Answering__ paper accepted to AAAI'18. It contains
+three models built using the PyTorch-based deep-learning NLP library, [AllenNLP](http://allennlp.org/).
+
+ * Decomposable Attention (Baseline): A simple model that decomposes the
+ problem into parallelizable attention computations ([Parikh et al. 2016](https://www.semanticscholar.org/paper/A-Decomposable-Attention-Model-for-Natural-Languag-Parikh-T%C3%A4ckstr%C3%B6m/07a9478e87a8304fc3267fa16e83e9f3bbd98b27)).
+ We directly use the AllenNLP implementation ([Gardner, et al., 2017](http://allennlp.org/papers/AllenNLP_white_paper.pdf))
+ of the decomposable attention model here.
+
+ * Ngram Overlap (Baseline): A simple word-overlap baseline  that uses the proportion of unigrams,
+ 1- skip bigrams, and 1-skip trigrams in the hypothesis that are also present in the premise as
+ three features. We feed these features into a two-layer perceptron.
+
+ * __Decomposable Graph Entailment Model__ (Proposed): Our proposed decomposed graph entailment
+ model that uses structure from the hypothesis to calculate entailment probabilities for each node
+ and edge in the graph structure and aggregates them for the final entailment computation. Please
+ refer to [our paper](http://ai2-website.s3.amazonaws.com/publications/scitail-aaai-2018_cameraready.pdf)
+ for more details.
+
+We use the [SciTail dataset](http://data.allenai.org/scitail/) and pre-trained models by default
+(downloaded automatically by the `scripts/download_data.sh` script). The models can be trained and
+evaluated on new datasets too as described below.
+
 
 # Setup Instruction
 
