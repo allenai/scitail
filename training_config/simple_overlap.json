@@ -25,12 +25,13 @@
   },
   "iterator": {
     "type": "basic",
-    "batch_size": 8
+    "batch_size": 16
 
   },
 
   "trainer": {
     "num_epochs": 140,
+    "grad_norm": 5,
     "patience": 20,
     "cuda_device": -1,
     "validation_metric": "+accuracy",
