@@ -66,8 +66,10 @@ Run the `download_data.sh` script to download the dataset and models used in the
    sh scripts/download_data.sh
   ```
 
-This will download and unzip the data to `SciTailV1.1` folder and models to `SciTailModelsV1`
-folder.
+This will download and unzip the data to `SciTailV1.1` folder (from
+ [here](http://data.allenai.org.s3.amazonaws.com/downloads/SciTailV1.1.zip))
+ and models to `SciTailModelsV1` folder (from
+ [here](https://s3-us-west-2.amazonaws.com/aristo-scitail/SciTailModelsV1.zip)).
 
 
 # Evaluate the SciTail models
