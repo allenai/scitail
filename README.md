@@ -50,6 +50,9 @@ evaluated on new datasets too as described below.
   Linux   (with CUDA): `conda install pytorch torchvision cuda80 -c soumith`
 
 
+5. Download the [Glove embeddings](https://nlp.stanford.edu/projects/glove/) into a `Glove/`
+folder in the root directory as `glove.<tokens>B.<dim>d.txt.gz` files.
+
 6. Test installation
 
  ```
@@ -63,7 +66,8 @@ Run the `download_data.sh` script to download the dataset and models used in the
    sh scripts/download_data.sh
   ```
 
-This will download and unzip the data to `SciTailV1` folder and models to `SciTailModelsV1` folder.
+This will download and unzip the data to `SciTailV1.1` folder and models to `SciTailModelsV1`
+folder.
 
 
 # Evaluate the SciTail models
@@ -74,6 +78,12 @@ To run the trained models on the test sets, run
 
 Note that the models include the vocabulary used for training these models. So these
 pre-trained models will have poor performance on new test sets with a different vocabulary.
+
+# View predictions of the SciTail models
+To view the model predictions, run
+  ```
+    sh scripts/predict_model.sh
+  ```
 
 # Train the SciTail models
 To train the models on new datasets, run

@@ -13,19 +13,19 @@ echo "# Evaluating DGEM model"
 echo "# -----------------------------------------------"
 python scitail/run.py evaluate \
   --archive_file SciTailModelsV1/dgem/model.tar.gz \
-  --evaluation_data_file SciTailV1/dgem_format/scitail_1.0_structure_test.tsv
+  --evaluation_data_file SciTailV1.1/dgem_format/scitail_1.0_structure_test.tsv
 
 echo "\n\n# -----------------------------------------------"
 echo "# Evaluating Decomposable Attention model"
 echo "# -----------------------------------------------"
 python scitail/run.py evaluate \
   --archive_file SciTailModelsV1/decompatt/model.tar.gz \
-  --evaluation_data_file SciTailV1/snli_format/scitail_1.0_test.txt
+  --evaluation_data_file SciTailV1.1/snli_format/scitail_1.0_test.txt
 
 echo "\n\n# -----------------------------------------------"
 echo "# Evaluating Ngram Overlap model"
 echo "# -----------------------------------------------"
 python scitail/run.py evaluate \
   --archive_file SciTailModelsV1/simple_overlap/model.tar.gz \
-  --evaluation_data_file SciTailV1/tsv_format/scitail_1.0_test.tsv
+  --evaluation_data_file SciTailV1.1/tsv_format/scitail_1.0_test.tsv
 
