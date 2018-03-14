@@ -12,9 +12,9 @@
         }
     },
     "train_data_path":
-    "SciTailV1/dgem_format/scitail_1.0_structure_train.tsv",
+    "SciTailV1.1/dgem_format/scitail_1.0_structure_train.tsv",
     "validation_data_path":
-    "SciTailV1/dgem_format/scitail_1.0_structure_dev.tsv",
+    "SciTailV1.1/dgem_format/scitail_1.0_structure_dev.tsv",
     "model": {
         "type": "tree_attention",
         "use_encoding_for_node": false,
