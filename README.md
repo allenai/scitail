@@ -86,6 +86,9 @@ To view the model predictions, run
   ```
     sh scripts/predict_model.sh
   ```
+The predictions would be added to the `predictions/` folder for each model. Each file has the 
+original examples along with the model's probability, logit predictions, and entailment score using 
+the keys: `label_probs`, `label_logits` and `score` respectively.
 
 # Train the SciTail models
 To train the models on new datasets, run
